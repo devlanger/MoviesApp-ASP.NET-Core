@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using MoviesWebApp.Data;
+using MoviesWebApp.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace MoviesWebApp
 {
@@ -26,6 +28,20 @@ namespace MoviesWebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+
+            })
+            .AddDefaultUI()
+            .AddDefaultTokenProviders()
+            .AddEntityFrameworkStores<MoviesWebAppContext>();
 
             services.AddDbContext<MoviesWebAppContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("MoviesWebAppContext")));
@@ -50,6 +66,7 @@ namespace MoviesWebApp
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
